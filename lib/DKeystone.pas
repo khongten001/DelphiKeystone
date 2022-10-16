@@ -235,6 +235,7 @@ type
     function Assemble(&Asm: string; Address: NativeUInt = 0): Boolean;
     function EncodeStr(InsertSpaces: Boolean = False): string;
     procedure SetSymResolverCb(cbFnc: Tks_sym_resolver_callback);
+    function ArchSupported(Arch: ks_arch): Boolean;
     function Version: string;
 
     property Data: TBytes read encoding;
@@ -331,6 +332,11 @@ end;
 procedure TKeystone.SetSymResolverCb(cbFnc: Tks_sym_resolver_callback);
 begin
   Option(KS_OPT_SYM_RESOLVER, NativeUInt(@cbFnc));
+end;
+
+function TKeystone.ArchSupported(Arch: ks_arch): Boolean;
+begin
+  Result := ks_arch_supported(Arch);
 end;
 
 function TKeystone.Assemble(&Asm: string; Address: NativeUInt): Boolean;

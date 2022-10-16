@@ -71,9 +71,10 @@ begin
       SetSymResolverCb(@sym_resolver);
       if Assemble(Memo1.Text, Address) then
       begin
-        Memo2.Text := EncodeStr(True);
         {$IFDEF _OR}
         Memo2.Text := Data.ToHex(True);
+        {$ELSE}
+        Memo2.Text := EncodeStr(True);
         {$ENDIF}
       end
       else
