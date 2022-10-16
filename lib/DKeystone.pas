@@ -30,7 +30,7 @@ interface
 uses
   Classes, SysUtils;
 
-{$REGION 'KEYSTONE HEADER'}
+{$REGION 'KEYSTONE'}
 
 const
   KS_API_MAJOR = 0;
@@ -219,7 +219,7 @@ type
   private
     { private declarations }
     ks: Pks_engine;
-    encoding: TBytes; //PByte;
+    encoding: TBytes;
     encoding_size: NativeUInt;
     stat_count: NativeUInt;
     function GetErrorStr: string;
@@ -278,7 +278,7 @@ var
   ks_asm: Tks_asm;
   ks_free: Tks_free;
 
-function DataToHex(Data: TBytes; Size: Integer;
+function DataToHex(Data: TBytes; Size: NativeUInt;
   InsertSpaces: Boolean = False): string; overload;
 const
   Convert: array [0 .. 15] of Char = '0123456789ABCDEF';
@@ -286,6 +286,7 @@ var
   i: Integer;
   P: PChar;
 begin
+  if Size = 0 then Exit('');
   if InsertSpaces then
     SetLength(Result, Size * 3)
   else
@@ -354,9 +355,7 @@ end;
 
 function TKeystone.EncodeStr(InsertSpaces: Boolean): string;
 begin
-  if encoding_size > 0 then
-  Result := DataToHex(encoding, encoding_size, InsertSpaces) else
-  Result := '';
+  Result := DataToHex(encoding, encoding_size, InsertSpaces);
 end;
 
 function TKeystone.Version: string;
@@ -374,12 +373,13 @@ end;
 
 function TKeystone.GetErrorStr: string;
 begin
-  Result := string(ks_strerror(ks_errno(ks)));
+  Result := string(ks_strerror(ks_err(GetErrNo)));
 end;
 
 { TKeystoneBytesHelper }
 
 function TKeystoneBytesHelper.ToHex(InsertSpaces: Boolean): string;
+var l: NativeUInt;
 begin
   Result := DataToHex(Self, Length(Self), InsertSpaces);
 end;

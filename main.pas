@@ -61,9 +61,6 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  {$IFDEF _OR}
-  BS: TBytes;
-  {$ENDIF}
   Address: NativeUInt;
 begin
   Address := StrToInt('$' + Trim(Edit1.Text));
@@ -76,12 +73,7 @@ begin
       begin
         Memo2.Text := EncodeStr(True);
         {$IFDEF _OR}
-        BS := Data;
-        try
-          Memo2.Text := BS.ToHex(True);
-        finally
-          SetLength(BS, 0);
-        end;
+        Memo2.Text := Data.ToHex(True);
         {$ENDIF}
       end
       else
