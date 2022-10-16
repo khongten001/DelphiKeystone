@@ -219,10 +219,9 @@ type
   private
     { private declarations }
     ks: Pks_engine;
-    encoding: PByte;
+    encoding: TBytes; //PByte;
     encoding_size: NativeUInt;
     stat_count: NativeUInt;
-    function GetData: TBytes;
     function GetErrorStr: string;
     function GetErrNo: Integer;
   protected
@@ -238,7 +237,7 @@ type
     procedure SetSymResolverCb(cbFnc: Tks_sym_resolver_callback);
     function Version: string;
 
-    property Data: TBytes read GetData;
+    property Data: TBytes read encoding;
     property EncodingSize: NativeUInt read encoding_size;
     property StatCount: NativeUInt read stat_count;
     property ErrorNo: Integer read GetErrNo;
@@ -279,7 +278,7 @@ var
   ks_asm: Tks_asm;
   ks_free: Tks_free;
 
-function DataToHex(Data: PByte; Size: Integer;
+function DataToHex(Data: TBytes; Size: Integer;
   InsertSpaces: Boolean = False): string; overload;
 const
   Convert: array [0 .. 15] of Char = '0123456789ABCDEF';
@@ -315,6 +314,7 @@ end;
 
 destructor TKeystone.Destroy;
 begin
+  SetLength(encoding, 0);
   ks_close(ks);
 
   inherited;
@@ -335,16 +335,20 @@ end;
 function TKeystone.Assemble(&Asm: string; Address: NativeUInt): Boolean;
 var
   err: ks_err;
+  encode: PByte;
 begin
   stat_count := 0;
   encoding_size := 0;
   try
-    err := ks_asm(ks, PAnsiChar(AnsiString(&Asm)), Address, @encoding,
+    err := ks_asm(ks, PAnsiChar(AnsiString(&Asm)), Address, @encode,
       @encoding_size, @stat_count);
 
+    SetLength(encoding, encoding_size);
+    Move(encode[0], encoding[0], encoding_size);
     Result := err = KS_ERR_OK;
   finally
-    ks_free(encoding);
+    ks_free(encode);
+    encode := nil;
   end;
 end;
 
@@ -360,13 +364,7 @@ var
   m,n: Cardinal;
 begin
   ks_version(@m, @n);
-  Result := Format('%u.%u', [m, n]);
-end;
-
-function TKeystone.GetData: TBytes;
-begin
-  SetLength(Result, encoding_size);
-  Move(encoding[0], Result[0], encoding_size);
+  Result := Format('Keystone Engine - v%u.%u', [m, n]);
 end;
 
 function TKeystone.GetErrNo: Integer;
@@ -383,7 +381,7 @@ end;
 
 function TKeystoneBytesHelper.ToHex(InsertSpaces: Boolean): string;
 begin
-  Result := DataToHex(@Self[0], Length(Self), InsertSpaces);
+  Result := DataToHex(Self, Length(Self), InsertSpaces);
 end;
 
 
@@ -422,7 +420,9 @@ begin
   @ks_free := nil;
 end;
 
-initialization LoadLib;
-finalization FreeLib;
+initialization
+  LoadLib;
+finalization
+  FreeLib;
 
 end.

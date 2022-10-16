@@ -69,6 +69,7 @@ begin
   Address := StrToInt('$' + Trim(Edit1.Text));
   with TKeystone.Create do
   begin
+    Caption := Version;
     try
       SetSymResolverCb(@sym_resolver);
       if Assemble(Memo1.Text, Address) then
