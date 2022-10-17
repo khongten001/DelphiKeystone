@@ -309,6 +309,9 @@ end;
 constructor TKeystone.Create(Arch: ks_arch; Mode: ks_mode);
 begin
   inherited Create;
+  encoding_size := 0;
+  stat_count := 0;
+  SetLength(encoding, 0);
 
   if not(ks_open(Arch, Integer(Mode), @ks) = KS_ERR_OK) then
     raise Exception.Create('failed on open');
