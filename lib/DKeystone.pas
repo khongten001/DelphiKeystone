@@ -400,17 +400,19 @@ procedure LoadLib;
 begin
   FLibHandle := LoadLibrary({$IFDEF CPUX86}'keystone.dll'{$ELSE}'keystoneX64.dll'{$ENDIF});
   if FLibHandle = 0 then
-      raise EDLLLoadError.Create('Unable to Load DLL');
-
-  @ks_version := GetProcAddress(FLibHandle, 'ks_version');
-  @ks_arch_supported := GetProcAddress(FLibHandle, 'ks_arch_supported');
-  @ks_open := GetProcAddress(FLibHandle, 'ks_open');
-  @ks_close := GetProcAddress(FLibHandle, 'ks_close');
-  @ks_errno := GetProcAddress(FLibHandle, 'ks_errno');
-  @ks_strerror := GetProcAddress(FLibHandle, 'ks_strerror');
-  @ks_option := GetProcAddress(FLibHandle, 'ks_option');
-  @ks_asm := GetProcAddress(FLibHandle, 'ks_asm');
-  @ks_free := GetProcAddress(FLibHandle, 'ks_free');
+    raise EDLLLoadError.Create('Unable to Load DLL')
+  else
+  begin
+    @ks_version := GetProcAddress(FLibHandle, 'ks_version');
+    @ks_arch_supported := GetProcAddress(FLibHandle, 'ks_arch_supported');
+    @ks_open := GetProcAddress(FLibHandle, 'ks_open');
+    @ks_close := GetProcAddress(FLibHandle, 'ks_close');
+    @ks_errno := GetProcAddress(FLibHandle, 'ks_errno');
+    @ks_strerror := GetProcAddress(FLibHandle, 'ks_strerror');
+    @ks_option := GetProcAddress(FLibHandle, 'ks_option');
+    @ks_asm := GetProcAddress(FLibHandle, 'ks_asm');
+    @ks_free := GetProcAddress(FLibHandle, 'ks_free');
+  end;
 end;
 
 procedure FreeLib;
